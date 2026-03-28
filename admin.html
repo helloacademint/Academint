@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en" data-page="admin">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Portal — Academint</title>
+<link rel="icon" type="image/jpeg" href="favicon.jpeg">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="style.css">
+<style>
+
+body { background: #f0f2f5; }
+
+/* ── LAYOUT ── */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  padding-top: 64px;
+}
+
+/* ── TOP NAV ── */
+.admin-topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--ink);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6vw;
+}
+
+.admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.35);
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.06em;
+}
+
+/* ── SIDEBAR ── */
+.admin-sidebar {
+  background: var(--ink);
+  padding: 24px 0;
+  position: fixed;
+  top: 64px; left: 0;
+  width: 240px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  z-index: 50;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 0 16px;
+  margin: 16px 0 6px;
+}
+
+.admin-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  margin: 0 8px 2px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: calc(100% - 16px);
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.admin-link:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.admin-link.active { background: rgba(24,162,74,0.15); color: #fff; font-weight: 600; }
+.admin-link.active svg { color: var(--leaf); }
+.admin-link svg { width: 17px; height: 17px; flex-shrink: 0; color: rgba(255,255,255,0.3); transition: color 0.2s; }
+
+.admin-sidebar-bottom {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  margin-top: auto;
+}
+
+.btn-signout {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.82rem; color: rgba(255,255,255,0.35);
+  cursor: pointer; transition: color 0.2s;
+  background: none; border: none; font-family: 'DM Sans', sans-serif;
+  padding: 0; width: 100%;
+}
+.btn-signout:hover { color: #ff8a95; }
+
+/* ── MAIN ── */
+.admin-main {
+  margin-left: 240px;
+  padding: 36px 40px;
+  min-height: calc(100vh - 64px);
+}
+
+.admin-panel { display: none; }
+.admin-panel.active { display: block; }
+
+/* ── PAGE HEADING ── */
+.admin-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-heading h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.admin-heading p { font-size: 0.85rem; color: var(--soft); }
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid #e8ecef;
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.stat-card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.stat-card-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stat-card-label { font-size: 0.78rem; color: var(--soft); font-weight: 500; }
+
+/* ── TABLES ── */
+.admin-table-wrap {
+  background: var(--white);
+  border: 1px solid #e8ecef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e8ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.table-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.table-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  background: var(--foam);
+  border: 1px solid var(--mist);
+  border-radius: 9px;
+  padding: 8px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  color: var(--ink);
+  outline: none;
+  width: 220px;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--leaf); }
+
+.filter-select {
+  background: var(--foam);
+  border: 1px solid var(--mist);
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+th {
+  background: var(--foam);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--soft);
+  padding: 12px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--mist);
+}
+
+td {
+  padding: 14px 20px;
+  font-size: 0.85rem;
+  color: var(--body);
+  border-bottom: 1px solid #f0f2f5;
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--foam); }
+
+.td-name { font-weight: 600; color: var(--ink); }
+.td-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.badge-active { background: rgba(24,162,74,0.1); color: var(--leaf); }
+.badge-pending { background: rgba(245,158,11,0.1); color: #d97706; }
+.badge-completed { background: rgba(99,102,241,0.1); color: #6366f1; }
+
+.td-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.action-btn {
+  padding: 5px 12px;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.action-btn-primary { background: var(--leaf); color: #fff; }
+.action-btn-primary:hover { background: #13913f; }
+.action-btn-danger { background: rgba(220,53,69,0.1); color: #dc3545; }
+.action-btn-danger:hover { background: rgba(220,53,69,0.2); }
+.action-btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--mist); }
+.action-btn-outline:hover { border-color: var(--leaf); color: var(--leaf); }
+
+/* ── MODAL ── */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 36px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.modal p {
+  font-size: 0.85rem;
+  color: var(--soft);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: var(--foam);
+  border: none;
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--soft);
+  transition: all 0.2s;
+}
+.modal-close:hover { background: var(--mist); color: var(--ink); }
+
+/* ── FORM ELEMENTS ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--soft);
+  margin-bottom: 7px;
+}
+.form-control {
+  width: 100%;
+  background: var(--foam);
+  border: 1px solid var(--mist);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-control:focus { border-color: var(--leaf); background: var(--white); }
+.form-control::placeholder { color: var(--soft); }
+
+select.form-control { cursor: pointer; }
+textarea.form-control { resize: vertical; min-height: 90px; }
+
+.form-hint {
+  font-size: 0.74rem;
+  color: var(--soft);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+
+.btn-save {
+  flex: 1;
+  background: var(--leaf);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-save:hover { background: #13913f; box-shadow: 0 6px 20px rgba(24,162,74,0.35); }
+
+.btn-cancel {
+  background: var(--foam);
+  color: var(--ink);
+  border: 1px solid var(--mist);
+  border-radius: 10px;
+  padding: 13px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--leaf); color: var(--leaf); }
+
+/* ── INVOICE CARD ── */
+.invoice-card {
+  background: var(--white);
+  border: 1px solid #e8ecef;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.invoice-header {
+  background: var(--ink);
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative; overflow: hidden;
+}
+.invoice-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(24,162,74,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(24,162,74,0.07) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+.invoice-id {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  position: relative; z-index: 2;
+}
+
+.invoice-body { padding: 24px 28px; }
+
+.invoice-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--mist);
+}
+.invoice-row:last-of-type { border-bottom: none; }
+.invoice-label { color: var(--soft); }
+.invoice-value { font-weight: 600; color: var(--ink); }
+
+/* ── MATERIALS UPLOAD SECTION ── */
+.upload-zone {
+  border: 2px dashed var(--mist);
+  border-radius: 14px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--foam);
+  margin-bottom: 16px;
+}
+.upload-zone:hover {
+  border-color: var(--leaf);
+  background: rgba(24,162,74,0.04);
+}
+.upload-icon { font-size: 2rem; margin-bottom: 10px; }
+.upload-text { font-size: 0.88rem; color: var(--soft); }
+.upload-text strong { color: var(--leaf); }
+
+/* Notifications toast */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s;
+  max-width: 340px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 3px solid var(--leaf); }
+.toast.error { border-left: 3px solid #dc3545; }
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: var(--ink);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.4s;
+}
+.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.loading-wordmark { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 24px; }
+.loading-wordmark span { color: var(--leaf); }
+.loading-bar { width: 160px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+.loading-bar-fill { height: 100%; background: var(--leaf); border-radius: 2px; animation: loadFill 1s ease forwards; }
+@keyframes loadFill { from { width: 0; } to { width: 100%; } }
+
+/* ── WORKSHOP CARD (admin) ── */
+.ws-admin-card {
+  background: var(--white);
+  border: 1px solid #e8ecef;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.ws-admin-header {
+  background: var(--ink);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ws-admin-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ws-admin-body { padding: 20px 24px; }
+
+.ws-admin-meta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.ws-admin-meta-item {
+  font-size: 0.82rem;
+  color: var(--soft);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ws-admin-meta-item svg { color: var(--leaf); }
+
+.ws-admin-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Progress bar */
+.progress-wrap { margin-bottom: 20px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--soft); margin-bottom: 6px; }
+.progress-bar { height: 6px; background: var(--mist); border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--leaf); border-radius: 10px; transition: width 0.5s ease; }
+
+@media (max-width: 900px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-sidebar { transform: translateX(-100%); transition: transform 0.3s; width: 260px; }
+  .admin-sidebar.open { transform: translateX(0); }
+  .admin-main { margin-left: 0; padding: 24px 20px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .admin-main { padding: 20px 16px; }
+  table { display: block; overflow-x: auto; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-wordmark">academint<span>.</span></div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Top Nav -->
+<nav class="admin-topnav">
+  <a class="wordmark" href="index.html">academint<span class="dot">.</span></a>
+  <div class="admin-badge">⚙ Admin Portal</div>
+</nav>
+
+<!-- Sidebar -->
+<div class="admin-sidebar" id="adminSidebar">
+  <nav style="padding: 0 0; flex: 1; padding-top: 8px;">
+    <div class="sidebar-section-label">Overview</div>
+    <button class="admin-link active" onclick="showPanel('overview')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+
+    <div class="sidebar-section-label">Students</div>
+    <button class="admin-link" onclick="showPanel('students')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Manage Students
+    </button>
+    <button class="admin-link" onclick="showPanel('registrations')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Registrations
+    </button>
+
+    <div class="sidebar-section-label">Workshops</div>
+    <button class="admin-link" onclick="showPanel('workshops')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Workshops
+    </button>
+    <button class="admin-link" onclick="showPanel('materials')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload Materials
+    </button>
+
+    <div class="sidebar-section-label">Finance & Recognition</div>
+    <button class="admin-link" onclick="showPanel('certificates')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+      Certificates
+    </button>
+    <button class="admin-link" onclick="showPanel('badges')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Badges
+    </button>
+    <button class="admin-link" onclick="showPanel('invoices')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payments & Invoices
+    </button>
+  </nav>
+
+  <div class="admin-sidebar-bottom">
+    <button class="btn-signout" onclick="handleSignOut()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="admin-main">
+
+  <!-- OVERVIEW -->
+  <div class="admin-panel active" id="panel-overview">
+    <div class="admin-heading">
+      <div><h1>Admin Dashboard</h1><p>Welcome back. Here's what's happening at Academint.</p></div>
+    </div>
+    <div class="stats-row" id="overview-stats">
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(24,162,74,0.1);">👥</div><div><div class="stat-card-num" id="stat-students">—</div><div class="stat-card-label">Total Students</div></div></div>
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(99,102,241,0.1);">📋</div><div><div class="stat-card-num" id="stat-workshops">—</div><div class="stat-card-label">Workshops</div></div></div>
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(245,158,11,0.1);">🏅</div><div><div class="stat-card-num" id="stat-certs">—</div><div class="stat-card-label">Certificates Issued</div></div></div>
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(16,185,129,0.1);">💰</div><div><div class="stat-card-num" id="stat-revenue">—</div><div class="stat-card-label">Total Revenue</div></div></div>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="table-header"><div class="table-title">Recent Registrations</div></div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Workshop</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="recent-registrations-body"><tr><td colspan="5" style="text-align:center;color:var(--soft);padding:24px;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STUDENTS -->
+  <div class="admin-panel" id="panel-students">
+    <div class="admin-heading">
+      <div><h1>Manage Students</h1><p>Add, edit, or remove student accounts and workshop access.</p></div>
+      <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="openModal('add-student')">+ Add Student</button>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">All Students</div>
+        <div class="table-controls">
+          <input type="text" class="search-input" placeholder="Search by name or email…" oninput="filterStudents(this.value)">
+          <select class="filter-select" onchange="filterByWorkshop(this.value)" id="workshop-filter-select">
+            <option value="">All Workshops</option>
+          </select>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Workshop(s)</th><th>Enrolled On</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="students-table-body"><tr><td colspan="6" style="text-align:center;color:var(--soft);padding:24px;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REGISTRATIONS -->
+  <div class="admin-panel" id="panel-registrations">
+    <div class="admin-heading">
+      <div><h1>Registrations</h1><p>All workshop registrations and payment status.</p></div>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">All Registrations</div>
+        <div class="table-controls">
+          <input type="text" class="search-input" placeholder="Search name or email…">
+          <select class="filter-select">
+            <option>All Workshops</option>
+          </select>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Workshop</th><th>Fee</th><th>Currency</th><th>Paid On</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="registrations-table-body"><tr><td colspan="8" style="text-align:center;color:var(--soft);padding:24px;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WORKSHOPS -->
+  <div class="admin-panel" id="panel-workshops">
+    <div class="admin-heading">
+      <div><h1>Workshops</h1><p>Manage all workshop details, schedules, and recordings.</p></div>
+      <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="openModal('add-workshop')">+ New Workshop</button>
+    </div>
+    <div id="workshops-list">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- MATERIALS UPLOAD -->
+  <div class="admin-panel" id="panel-materials">
+    <div class="admin-heading">
+      <div><h1>Upload Materials</h1><p>Add recordings, PDFs, R scripts, and datasets to workshops.</p></div>
+    </div>
+    <div class="admin-table-wrap" style="padding:28px; border:none;">
+      <div class="form-group">
+        <label>Select Workshop</label>
+        <select class="form-control" id="material-workshop-select">
+          <option value="">Choose a workshop…</option>
+        </select>
+      </div>
+
+      <div style="border:1px solid #e8ecef;border-radius:14px;overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e8ecef;font-size:0.95rem;font-weight:700;color:var(--ink);">Add Recording Link</div>
+        <div style="padding:20px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Day</label>
+              <select class="form-control" id="rec-day"><option>1</option><option>2</option><option>3</option></select>
+            </div>
+            <div class="form-group">
+              <label>Session Title</label>
+              <input type="text" class="form-control" id="rec-title" placeholder="e.g. Foundations of Time Series">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Recording URL</label>
+            <input type="url" class="form-control" id="rec-url" placeholder="https://drive.google.com/…">
+          </div>
+          <div class="form-group">
+            <label>Topics Covered</label>
+            <input type="text" class="form-control" id="rec-topics" placeholder="Stationarity, ACF, Random walk…">
+          </div>
+          <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="saveRecording()">Save Recording Link</button>
+        </div>
+      </div>
+
+      <div style="border:1px solid #e8ecef;border-radius:14px;overflow:hidden;margin-top:20px;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e8ecef;font-size:0.95rem;font-weight:700;color:var(--ink);">Add Material / File</div>
+        <div style="padding:20px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>File Name</label>
+              <input type="text" class="form-control" id="mat-name" placeholder="Day 1 — R Script">
+            </div>
+            <div class="form-group">
+              <label>File Type</label>
+              <select class="form-control" id="mat-type">
+                <option value="pdf">PDF</option>
+                <option value="r">R Script</option>
+                <option value="zip">ZIP</option>
+                <option value="link">External Link</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>URL / Link</label>
+            <input type="url" class="form-control" id="mat-url" placeholder="https://drive.google.com/…">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" class="form-control" id="mat-desc" placeholder="R script used in Day 1 session">
+          </div>
+          <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="saveMaterial()">Add Material</button>
+        </div>
+      </div>
+
+      <div style="border:1px solid #e8ecef;border-radius:14px;overflow:hidden;margin-top:20px;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e8ecef;font-size:0.95rem;font-weight:700;color:var(--ink);">Add Feedback Form Link</div>
+        <div style="padding:20px;">
+          <div class="form-group">
+            <label>Google Form URL</label>
+            <input type="url" class="form-control" id="feedback-url" placeholder="https://forms.google.com/…">
+          </div>
+          <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="saveFeedbackUrl()">Save Feedback Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATES -->
+  <div class="admin-panel" id="panel-certificates">
+    <div class="admin-heading">
+      <div><h1>Certificates</h1><p>Issue and manage certificates for workshop participants.</p></div>
+      <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="openModal('issue-cert')">+ Issue Certificate</button>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="table-header"><div class="table-title">Issued Certificates</div></div>
+      <table>
+        <thead><tr><th>Student</th><th>Workshop</th><th>Certificate ID</th><th>Issued On</th><th>Actions</th></tr></thead>
+        <tbody id="certs-table-body"><tr><td colspan="5" style="text-align:center;color:var(--soft);padding:24px;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="admin-panel" id="panel-badges">
+    <div class="admin-heading">
+      <div><h1>Badges</h1><p>Award badges to students for achievements and milestones.</p></div>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Assign Badge to Student</div>
+      </div>
+      <div style="padding:24px;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Student</label>
+            <select class="form-control" id="badge-student-select">
+              <option value="">Select student…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Badge</label>
+            <select class="form-control" id="badge-type-select">
+              <option value="first_enrol">🎓 First Enrolment</option>
+              <option value="completed">✅ Workshop Completed</option>
+              <option value="feedback">💬 Feedback Champion</option>
+              <option value="certified">🏅 Certified Learner</option>
+              <option value="early_bird">🌅 Early Bird</option>
+              <option value="multi_workshop">🔥 Dedicated Learner</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-save" style="width:auto;padding:11px 22px;" onclick="awardBadge()">Award Badge</button>
+      </div>
+    </div>
+    <div class="admin-table-wrap" style="margin-top:20px;">
+      <div class="table-header"><div class="table-title">All Badge Assignments</div></div>
+      <table>
+        <thead><tr><th>Student</th><th>Badge</th><th>Awarded On</th><th>Actions</th></tr></thead>
+        <tbody id="badges-table-body"><tr><td colspan="4" style="text-align:center;color:var(--soft);padding:24px;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INVOICES & PAYMENTS -->
+  <div class="admin-panel" id="panel-invoices">
+    <div class="admin-heading">
+      <div><h1>Payments & Invoices</h1><p>View all payment records and generate invoices.</p></div>
+    </div>
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(24,162,74,0.1);">₹</div><div><div class="stat-card-num" id="inv-inr">—</div><div class="stat-card-label">India Revenue (INR)</div></div></div>
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(99,102,241,0.1);">$</div><div><div class="stat-card-num" id="inv-usd">—</div><div class="stat-card-label">Intl Revenue (USD)</div></div></div>
+      <div class="stat-card"><div class="stat-card-icon" style="background:rgba(245,158,11,0.1);">📋</div><div><div class="stat-card-num" id="inv-count">—</div><div class="stat-card-label">Total Transactions</div></div></div>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="table-header">
+        <div class="table-title">All Transactions</div>
+        <div class="table-controls">
+          <input type="text" class="search-input" placeholder="Search…">
+          <select class="filter-select"><option>All</option><option>INR</option><option>USD</option></select>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Workshop</th><th>Amount</th><th>Currency</th><th>Payment ID</th><th>Date</th><th>Invoice</th></tr></thead>
+        <tbody id="invoices-table-body"><tr><td colspan="8" style="text-align:center;color:var(--soft);padding:24px;">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add Student Modal -->
+<div class="modal-backdrop" id="modal-add-student">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-student')">✕</button>
+    <h2>Add New Student</h2>
+    <p>Create a student account. They'll receive login credentials via email.</p>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name</label><input type="text" class="form-control" id="new-student-name" placeholder="Dr. Priya Menon"></div>
+      <div class="form-group"><label>Email</label><input type="email" class="form-control" id="new-student-email" placeholder="student@example.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input type="text" class="form-control" id="new-student-phone" placeholder="+91 98765 43210"></div>
+      <div class="form-group"><label>Workshop</label><select class="form-control" id="new-student-workshop"><option value="">Select…</option></select></div>
+    </div>
+    <div class="form-group"><label>Temporary Password</label><input type="text" class="form-control" id="new-student-pass" placeholder="Academint@2026"><div class="form-hint">Student will be asked to change this on first login.</div></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('add-student')">Cancel</button>
+      <button class="btn-save" onclick="addStudent()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Workshop Modal -->
+<div class="modal-backdrop" id="modal-add-workshop">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-workshop')">✕</button>
+    <h2>Add New Workshop</h2>
+    <p>Create a new workshop entry in the system.</p>
+    <div class="form-group"><label>Workshop Title</label><input type="text" class="form-control" id="ws-title" placeholder="Time Series Analysis Using R"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Dates</label><input type="text" class="form-control" id="ws-dates" placeholder="27, 28, 29 March 2026"></div>
+      <div class="form-group"><label>Time (IST)</label><input type="text" class="form-control" id="ws-time" placeholder="6:30 PM – 8:30 PM"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Platform</label><select class="form-control" id="ws-platform"><option>Google Meet</option><option>Zoom</option></select></div>
+      <div class="form-group"><label>Instructor</label><input type="text" class="form-control" id="ws-instructor" placeholder="Dr. Hersch Sahay"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>India Fee (₹)</label><input type="number" class="form-control" id="ws-fee-inr" placeholder="1499"></div>
+      <div class="form-group"><label>Intl Fee ($)</label><input type="number" class="form-control" id="ws-fee-usd" placeholder="18"></div>
+    </div>
+    <div class="form-group"><label>Status</label><select class="form-control" id="ws-status"><option value="upcoming">Upcoming</option><option value="active">Active / Enrolling</option><option value="completed">Completed</option></select></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('add-workshop')">Cancel</button>
+      <button class="btn-save" onclick="addWorkshop()">Create Workshop</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Certificate Modal -->
+<div class="modal-backdrop" id="modal-issue-cert">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('issue-cert')">✕</button>
+    <h2>Issue Certificate</h2>
+    <p>Issue an official certificate of completion to a student.</p>
+    <div class="form-row">
+      <div class="form-group"><label>Student</label><select class="form-control" id="cert-student-select"><option value="">Select student…</option></select></div>
+      <div class="form-group"><label>Workshop</label><select class="form-control" id="cert-workshop-select"><option value="">Select workshop…</option></select></div>
+    </div>
+    <div class="form-group"><label>Certificate Download URL</label><input type="url" class="form-control" id="cert-download-url" placeholder="https://drive.google.com/…"><div class="form-hint">Link to the PDF certificate file (Google Drive, Dropbox, etc.)</div></div>
+    <div class="form-group"><label>Certificate ID</label><input type="text" class="form-control" id="cert-id-input" placeholder="ACM-2026-TSR-001"><div class="form-hint">Unique ID used for verification. Auto-generate or enter manually.</div></div>
+    <div class="form-group"><label>Issue Date</label><input type="date" class="form-control" id="cert-issue-date"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('issue-cert')">Cancel</button>
+      <button class="btn-save" onclick="issueCertificate()">Issue Certificate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, arrayUnion,
+    collection, query, getDocs, orderBy, serverTimestamp, where
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBiTfppJTL3EVHgT4Dm1mJUhbhPi_CCrx4",
+    authDomain: "academint-2a3f3.firebaseapp.com",
+    projectId: "academint-2a3f3",
+    storageBucket: "academint-2a3f3.firebasestorage.app",
+    messagingSenderId: "878349109026",
+    appId: "1:878349109026:web:f999530f905f8c1ccc877b",
+    measurementId: "G-YW769PREMF"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let allStudents = [];
+  let allWorkshops = [];
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+    if (!adminDoc.exists()) { window.location.href = 'dashboard.html'; return; }
+
+    await loadAllData();
+
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 500);
+  });
+
+  async function loadAllData() {
+    // Load workshops
+    const wsSnap = await getDocs(collection(db, 'workshops'));
+    allWorkshops = wsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Populate workshop dropdowns
+    const wsSel = document.getElementById('workshop-filter-select');
+    const matSel = document.getElementById('material-workshop-select');
+    const newStudentWs = document.getElementById('new-student-workshop');
+    const certWsSel = document.getElementById('cert-workshop-select');
+
+    allWorkshops.forEach(ws => {
+      [wsSel, matSel, newStudentWs, certWsSel].forEach(sel => {
+        if (sel) {
+          const opt = document.createElement('option');
+          opt.value = ws.id;
+          opt.textContent = ws.title || ws.id;
+          sel.appendChild(opt);
+        }
+      });
+    });
+
+    // Load students
+    const stuSnap = await getDocs(collection(db, 'students'));
+    allStudents = stuSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    renderStudentsTable(allStudents);
+
+    // Populate student selects
+    const certStudSel = document.getElementById('cert-student-select');
+    const badgeStudSel = document.getElementById('badge-student-select');
+    allStudents.forEach(s => {
+      [certStudSel, badgeStudSel].forEach(sel => {
+        if (sel) {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = s.name || s.email || s.id;
+          sel.appendChild(opt);
+        }
+      });
+    });
+
+    // Load registrations
+    const regSnap = await getDocs(query(collection(db, 'registrations'), orderBy('registeredOn', 'desc')));
+    const regs = regSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderRegistrationsTable(regs);
+
+    // Load certificates
+    const certSnap = await getDocs(collection(db, 'certificates'));
+    const certs = certSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderCertsTable(certs);
+
+    // Render workshops
+    renderWorkshopsList(allWorkshops);
+
+    // Load invoice/payment stats
+    let inr = 0, usd = 0;
+    let invHTML = '';
+    regs.forEach(r => {
+      if (r.currency === 'INR') inr += Number(r.fee || 0);
+      else if (r.currency === 'USD') usd += Number(r.fee || 0);
+
+      const ws = allWorkshops.find(w => w.id === r.workshopId);
+      invHTML += `<tr>
+        <td class="td-name">${r.studentName || '—'}</td>
+        <td>${r.studentEmail || '—'}</td>
+        <td>${ws?.title || r.workshopId || '—'}</td>
+        <td>${r.currency === 'INR' ? '₹' : '$'}${r.fee || '—'}</td>
+        <td><span class="td-badge ${r.currency === 'INR' ? 'badge-active' : 'badge-pending'}">${r.currency || '—'}</span></td>
+        <td>${r.paymentId || '—'}</td>
+        <td>${r.registeredOn?.toDate ? r.registeredOn.toDate().toLocaleDateString('en-IN') : r.registeredOn || '—'}</td>
+        <td><button class="action-btn action-btn-outline" onclick="generateInvoice('${r.id}')">Invoice</button></td>
+      </tr>`;
+    });
+
+    document.getElementById('inv-inr').textContent = '₹' + inr.toLocaleString('en-IN');
+    document.getElementById('inv-usd').textContent = '$' + usd;
+    document.getElementById('inv-count').textContent = regs.length;
+    document.getElementById('invoices-table-body').innerHTML = invHTML || '<tr><td colspan="8" style="text-align:center;color:var(--soft);padding:24px;">No payments yet</td></tr>';
+
+    // Overview stats
+    document.getElementById('stat-students').textContent = allStudents.length;
+    document.getElementById('stat-workshops').textContent = allWorkshops.length;
+    document.getElementById('stat-certs').textContent = certs.length;
+    document.getElementById('stat-revenue').textContent = '₹' + inr.toLocaleString('en-IN');
+
+    // Recent regs
+    const recHTML = regs.slice(0, 8).map(r => {
+      const ws = allWorkshops.find(w => w.id === r.workshopId);
+      return `<tr>
+        <td class="td-name">${r.studentName || '—'}</td>
+        <td>${r.studentEmail || '—'}</td>
+        <td>${ws?.title || r.workshopId || '—'}</td>
+        <td>${r.registeredOn?.toDate ? r.registeredOn.toDate().toLocaleDateString('en-IN') : r.registeredOn || '—'}</td>
+        <td><span class="td-badge badge-active">Confirmed</span></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('recent-registrations-body').innerHTML = recHTML || '<tr><td colspan="5" style="text-align:center;color:var(--soft);padding:24px;">No registrations yet</td></tr>';
+
+    // Badges table
+    let badgesHTML = '';
+    allStudents.forEach(s => {
+      (s.badges || []).forEach(b => {
+        badgesHTML += `<tr>
+          <td class="td-name">${s.name || s.email}</td>
+          <td>${b}</td>
+          <td>—</td>
+          <td><button class="action-btn action-btn-danger" onclick="revokeBadge('${s.id}','${b}')">Revoke</button></td>
+        </tr>`;
+      });
+    });
+    document.getElementById('badges-table-body').innerHTML = badgesHTML || '<tr><td colspan="4" style="text-align:center;color:var(--soft);padding:24px;">No badges awarded yet</td></tr>';
+  }
+
+  function renderStudentsTable(students) {
+    const html = students.map(s => {
+      const wsNames = (s.enrolledWorkshops || []).map(wid => allWorkshops.find(w => w.id === wid)?.title || wid).join(', ') || '—';
+      return `<tr>
+        <td class="td-name">${s.name || '—'}</td>
+        <td>${s.email || '—'}</td>
+        <td style="max-width:200px;font-size:0.8rem;">${wsNames}</td>
+        <td>${s.enrolledOn || '—'}</td>
+        <td><span class="td-badge badge-active">Active</span></td>
+        <td class="td-actions">
+          <button class="action-btn action-btn-outline" onclick="editStudent('${s.id}')">Edit</button>
+          <button class="action-btn action-btn-danger" onclick="deleteStudent('${s.id}')">Remove</button>
+        </td>
+      </tr>`;
+    }).join('');
+    document.getElementById('students-table-body').innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--soft);padding:24px;">No students yet</td></tr>';
+  }
+
+  function renderRegistrationsTable(regs) {
+    const html = regs.map(r => {
+      const ws = allWorkshops.find(w => w.id === r.workshopId);
+      return `<tr>
+        <td class="td-name">${r.studentName || '—'}</td>
+        <td>${r.studentEmail || '—'}</td>
+        <td>${ws?.title || r.workshopId || '—'}</td>
+        <td>${r.currency === 'INR' ? '₹' : '$'}${r.fee || '—'}</td>
+        <td>${r.currency || '—'}</td>
+        <td>${r.registeredOn?.toDate ? r.registeredOn.toDate().toLocaleDateString('en-IN') : r.registeredOn || '—'}</td>
+        <td><span class="td-badge badge-active">Paid</span></td>
+        <td class="td-actions">
+          <button class="action-btn action-btn-outline" onclick="generateInvoice('${r.id}')">Invoice</button>
+        </td>
+      </tr>`;
+    }).join('');
+    document.getElementById('registrations-table-body').innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--soft);padding:24px;">No registrations yet</td></tr>';
+  }
+
+  function renderCertsTable(certs) {
+    const html = certs.map(c => {
+      const ws = allWorkshops.find(w => w.id === c.workshopId);
+      const stu = allStudents.find(s => s.id === c.studentId);
+      return `<tr>
+        <td class="td-name">${stu?.name || c.studentId || '—'}</td>
+        <td>${ws?.title || c.workshopId || '—'}</td>
+        <td style="font-family:monospace;font-size:0.8rem;">${c.certificateId || '—'}</td>
+        <td>${c.issuedOn || '—'}</td>
+        <td class="td-actions">
+          ${c.downloadUrl ? `<a href="${c.downloadUrl}" target="_blank" class="action-btn action-btn-primary">View</a>` : ''}
+          <button class="action-btn action-btn-danger" onclick="deleteCert('${c.id}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+    document.getElementById('certs-table-body').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:var(--soft);padding:24px;">No certificates issued yet</td></tr>';
+  }
+
+  function renderWorkshopsList(workshops) {
+    const html = workshops.map(ws => `
+      <div class="ws-admin-card">
+        <div class="ws-admin-header">
+          <div class="ws-admin-title">${ws.title || 'Untitled Workshop'}</div>
+          <span class="td-badge ${ws.status === 'active' ? 'badge-active' : ws.status === 'completed' ? 'badge-completed' : 'badge-pending'}">${ws.status || 'upcoming'}</span>
+        </div>
+        <div class="ws-admin-body">
+          <div class="ws-admin-meta">
+            <div class="ws-admin-meta-item"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${ws.dates || '—'}</div>
+            <div class="ws-admin-meta-item"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${ws.time || '—'}</div>
+            <div class="ws-admin-meta-item"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${ws.instructor || '—'}</div>
+            <div class="ws-admin-meta-item">₹${ws.feeInr || '—'} / $${ws.feeUsd || '—'}</div>
+          </div>
+          <div class="ws-admin-actions">
+            <button class="action-btn action-btn-outline" onclick="showPanel('materials')">Add Materials</button>
+            <button class="action-btn action-btn-danger" onclick="deleteWorkshop('${ws.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`).join('') || '<div style="padding:24px;text-align:center;color:var(--soft);">No workshops yet. Add one above.</div>';
+    document.getElementById('workshops-list').innerHTML = html;
+  }
+
+  // ── ACTIONS ──
+
+  window.addStudent = async function() {
+    const name = document.getElementById('new-student-name').value.trim();
+    const email = document.getElementById('new-student-email').value.trim();
+    const phone = document.getElementById('new-student-phone').value.trim();
+    const workshopId = document.getElementById('new-student-workshop').value;
+    const pass = document.getElementById('new-student-pass').value.trim();
+
+    if (!name || !email || !pass) { showToast('Please fill in name, email, and password.', 'error'); return; }
+
+    try {
+      // Create Firebase Auth user
+      const tempAuth = getAuth(app);
+      const cred = await createUserWithEmailAndPassword(tempAuth, email, pass);
+
+      // Save to Firestore
+      await setDoc(doc(db, 'students', cred.user.uid), {
+        name, email, phone,
+        enrolledWorkshops: workshopId ? [workshopId] : [],
+        enrolledOn: new Date().toLocaleDateString('en-IN'),
+        badges: [],
+        createdAt: serverTimestamp()
+      });
+
+      // Add registration record
+      if (workshopId) {
+        const ws = allWorkshops.find(w => w.id === workshopId);
+        await addDoc(collection(db, 'registrations'), {
+          studentId: cred.user.uid,
+          studentName: name, studentEmail: email,
+          workshopId,
+          fee: ws?.feeInr || '',
+          currency: 'INR',
+          registeredOn: serverTimestamp()
+        });
+      }
+
+      closeModal('add-student');
+      showToast('Student account created successfully!', 'success');
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || 'Failed to create student.', 'error');
+    }
+  };
+
+  window.addWorkshop = async function() {
+    const data = {
+      title: document.getElementById('ws-title').value.trim(),
+      dates: document.getElementById('ws-dates').value.trim(),
+      time: document.getElementById('ws-time').value.trim(),
+      platform: document.getElementById('ws-platform').value,
+      instructor: document.getElementById('ws-instructor').value.trim(),
+      feeInr: document.getElementById('ws-fee-inr').value,
+      feeUsd: document.getElementById('ws-fee-usd').value,
+      status: document.getElementById('ws-status').value,
+      recordings: [], materials: [], schedule: [],
+      createdAt: serverTimestamp()
+    };
+    if (!data.title) { showToast('Please enter a workshop title.', 'error'); return; }
+    await addDoc(collection(db, 'workshops'), data);
+    closeModal('add-workshop');
+    showToast('Workshop created!', 'success');
+    await loadAllData();
+  };
+
+  window.deleteWorkshop = async function(id) {
+    if (!confirm('Delete this workshop?')) return;
+    await deleteDoc(doc(db, 'workshops', id));
+    showToast('Workshop deleted.', 'success');
+    await loadAllData();
+  };
+
+  window.deleteStudent = async function(id) {
+    if (!confirm('Remove this student?')) return;
+    await deleteDoc(doc(db, 'students', id));
+    showToast('Student removed.', 'success');
+    await loadAllData();
+  };
+
+  window.issueCertificate = async function() {
+    const studentId = document.getElementById('cert-student-select').value;
+    const workshopId = document.getElementById('cert-workshop-select').value;
+    const downloadUrl = document.getElementById('cert-download-url').value.trim();
+    const certId = document.getElementById('cert-id-input').value.trim();
+    const issueDate = document.getElementById('cert-issue-date').value;
+
+    if (!studentId || !workshopId || !certId) { showToast('Please fill in all required fields.', 'error'); return; }
+
+    const ws = allWorkshops.find(w => w.id === workshopId);
+    const stu = allStudents.find(s => s.id === studentId);
+
+    await addDoc(collection(db, 'certificates'), {
+      studentId, workshopId,
+      downloadUrl, certificateId: certId,
+      verifyUrl: `https://script.google.com/macros/s/AKfycbxGgGz_9gaCjuFKw4x63OF2SNsEOQ_vtW3P5gdJwf_WA6IEUc1C6IgLrrl_P_nnKpfduQ/exec?id=${certId}`,
+      issuedOn: issueDate || new Date().toLocaleDateString('en-IN'),
+      createdAt: serverTimestamp()
+    });
+
+    // Award certified badge
+    await updateDoc(doc(db, 'students', studentId), { badges: arrayUnion('certified') });
+
+    closeModal('issue-cert');
+    showToast(`Certificate issued to ${stu?.name || 'student'}!`, 'success');
+    await loadAllData();
+  };
+
+  window.deleteCert = async function(id) {
+    if (!confirm('Delete this certificate?')) return;
+    await deleteDoc(doc(db, 'certificates', id));
+    showToast('Certificate deleted.', 'success');
+    await loadAllData();
+  };
+
+  window.awardBadge = async function() {
+    const studentId = document.getElementById('badge-student-select').value;
+    const badge = document.getElementById('badge-type-select').value;
+    if (!studentId || !badge) { showToast('Please select a student and badge.', 'error'); return; }
+    await updateDoc(doc(db, 'students', studentId), { badges: arrayUnion(badge) });
+    const stu = allStudents.find(s => s.id === studentId);
+    showToast(`Badge awarded to ${stu?.name || 'student'}!`, 'success');
+    await loadAllData();
+  };
+
+  window.revokeBadge = async function(studentId, badge) {
+    if (!confirm('Revoke this badge?')) return;
+    const stu = allStudents.find(s => s.id === studentId);
+    const newBadges = (stu?.badges || []).filter(b => b !== badge);
+    await updateDoc(doc(db, 'students', studentId), { badges: newBadges });
+    showToast('Badge revoked.', 'success');
+    await loadAllData();
+  };
+
+  window.saveRecording = async function() {
+    const wsId = document.getElementById('material-workshop-select').value;
+    if (!wsId) { showToast('Please select a workshop first.', 'error'); return; }
+
+    const day = document.getElementById('rec-day').value;
+    const title = document.getElementById('rec-title').value.trim();
+    const url = document.getElementById('rec-url').value.trim();
+    const topics = document.getElementById('rec-topics').value.trim();
+
+    const wsRef = doc(db, 'workshops', wsId);
+    const wsDoc = await getDoc(wsRef);
+    const ws = wsDoc.data();
+    const recordings = ws.recordings || [];
+    const dayIndex = parseInt(day) - 1;
+
+    recordings[dayIndex] = { title, url, topics, day: parseInt(day) };
+    await updateDoc(wsRef, { recordings });
+    showToast('Recording link saved!', 'success');
+  };
+
+  window.saveMaterial = async function() {
+    const wsId = document.getElementById('material-workshop-select').value;
+    if (!wsId) { showToast('Please select a workshop first.', 'error'); return; }
+
+    const material = {
+      name: document.getElementById('mat-name').value.trim(),
+      type: document.getElementById('mat-type').value,
+      url: document.getElementById('mat-url').value.trim(),
+      description: document.getElementById('mat-desc').value.trim()
+    };
+
+    await updateDoc(doc(db, 'workshops', wsId), { materials: arrayUnion(material) });
+    showToast('Material added!', 'success');
+  };
+
+  window.saveFeedbackUrl = async function() {
+    const wsId = document.getElementById('material-workshop-select').value;
+    const url = document.getElementById('feedback-url').value.trim();
+    if (!wsId || !url) { showToast('Please select a workshop and enter a URL.', 'error'); return; }
+    await updateDoc(doc(db, 'workshops', wsId), { feedbackUrl: url });
+    showToast('Feedback link saved!', 'success');
+  };
+
+  window.generateInvoice = function(regId) {
+    // Find reg
+    // In a real implementation, open a print-ready invoice page
+    showToast('Invoice feature — open invoice.html with regId=' + regId, 'success');
+  };
+
+  window.filterStudents = function(val) {
+    const filtered = allStudents.filter(s =>
+      (s.name || '').toLowerCase().includes(val.toLowerCase()) ||
+      (s.email || '').toLowerCase().includes(val.toLowerCase())
+    );
+    renderStudentsTable(filtered);
+  };
+
+  window.filterByWorkshop = function(wsId) {
+    if (!wsId) { renderStudentsTable(allStudents); return; }
+    const filtered = allStudents.filter(s => (s.enrolledWorkshops || []).includes(wsId));
+    renderStudentsTable(filtered);
+  };
+
+  window.editStudent = function(id) {
+    showToast('Edit student feature — coming soon.', 'success');
+  };
+
+  window.handleSignOut = async function() {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  };
+
+  // Toast helper
+  window.showToast = function(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 3500);
+  };
+</script>
+
+<script>
+function showPanel(id) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.admin-link').forEach(l => {
+    l.classList.toggle('active', l.getAttribute('onclick')?.includes("'" + id + "'"));
+  });
+  if (window.innerWidth <= 900) {
+    document.getElementById('adminSidebar').classList.remove('open');
+  }
+  window.scrollTo(0, 0);
+}
+
+function openModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) m.classList.remove('open');
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-page="login">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Academint</title>
+<link rel="icon" type="image/jpeg" href="favicon.jpeg">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+<style>
+
+.login-page {
+  min-height: 100vh;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 5vw 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: min(700px, 100vw); height: min(700px, 100vw);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(24,162,74,0.13) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-page::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: -100px;
+  width: min(500px, 100vw); height: min(500px, 100vw);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(24,162,74,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-texture {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(24,162,74,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24,162,74,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  pointer-events: none;
+}
+
+.login-container {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.login-brand-sub {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+
+.login-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 40px;
+  backdrop-filter: blur(12px);
+}
+
+.login-card h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+
+.login-card .login-sub {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.form-group input::placeholder { color: rgba(255,255,255,0.25); }
+
+.form-group input:focus {
+  border-color: var(--leaf);
+  background: rgba(24,162,74,0.06);
+}
+
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  margin-top: -8px;
+  margin-bottom: 22px;
+  transition: color 0.2s;
+}
+.forgot-link:hover { color: var(--leaf); }
+
+.btn-login {
+  width: 100%;
+  background: var(--leaf);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-login:hover {
+  background: #13913f;
+  box-shadow: 0 8px 28px rgba(24,162,74,0.45);
+  transform: translateY(-1px);
+}
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+}
+.login-divider::before, .login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.login-divider span {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.06em;
+}
+
+.login-notice {
+  background: rgba(24,162,74,0.08);
+  border: 1px solid rgba(24,162,74,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-notice a {
+  color: var(--leaf);
+  text-decoration: none;
+}
+
+.error-msg {
+  background: rgba(220,53,69,0.12);
+  border: 1px solid rgba(220,53,69,0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #ff8a95;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.success-msg {
+  background: rgba(24,162,74,0.12);
+  border: 1px solid rgba(24,162,74,0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #7ee8a2;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* Tabs */
+.login-tabs {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.login-tab {
+  flex: 1;
+  padding: 9px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  border-radius: 7px;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.login-tab.active {
+  background: var(--leaf);
+  color: #fff;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .login-card { padding: 28px 22px; }
+  .login-page { padding: 80px 5vw 40px; }
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="wordmark" href="index.html">academint<span class="dot">.</span></a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="workshops.html" class="nav-link">Workshops</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="login.html" class="nav-cta active">My Account</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" id="menuClose">✕</button>
+  <a href="index.html">Home</a>
+  <a href="workshops.html">Workshops</a>
+  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+  <a href="login.html" class="mobile-cta active">My Account</a>
+</div>
+
+<div class="login-page">
+  <div class="login-texture"></div>
+  <div class="login-container fade-up">
+
+    <div class="login-brand">
+      <a class="wordmark" href="index.html">academint<span class="dot">.</span></a>
+      <p class="login-brand-sub">Student Portal</p>
+    </div>
+
+    <div class="login-card">
+
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchTab('signin')">Sign In</button>
+        <button class="login-tab" onclick="switchTab('reset')">Reset Password</button>
+      </div>
+
+      <!-- SIGN IN -->
+      <div class="tab-panel active" id="tab-signin">
+        <h2>Welcome back</h2>
+        <p class="login-sub">Sign in to access your workshop materials, recordings and certificate.</p>
+
+        <div class="error-msg" id="signin-error"></div>
+        <div class="success-msg" id="signin-success"></div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signin-password" placeholder="Your password" autocomplete="current-password">
+        </div>
+
+        <a href="#" class="forgot-link" onclick="switchTab('reset'); return false;">Forgot password?</a>
+
+        <button class="btn-login" id="signin-btn" onclick="handleSignIn()">
+          <span id="signin-label">Sign In</span>
+          <div class="spinner" id="signin-spinner"></div>
+        </button>
+
+        <div class="login-notice">
+          Don't have an account? You'll receive login credentials via email after registering for a workshop. Need help? <a href="contact.html">Contact us</a>.
+        </div>
+      </div>
+
+      <!-- RESET PASSWORD -->
+      <div class="tab-panel" id="tab-reset">
+        <h2>Reset Password</h2>
+        <p class="login-sub">Enter your email and we'll send you a link to reset your password.</p>
+
+        <div class="error-msg" id="reset-error"></div>
+        <div class="success-msg" id="reset-success"></div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="reset-email" placeholder="you@example.com">
+        </div>
+
+        <button class="btn-login" id="reset-btn" onclick="handleReset()">
+          <span id="reset-label">Send Reset Link</span>
+          <div class="spinner" id="reset-spinner"></div>
+        </button>
+
+        <div class="login-notice">
+          Remember your password? <a href="#" onclick="switchTab('signin'); return false;">Sign in instead</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBiTfppJTL3EVHgT4Dm1mJUhbhPi_CCrx4",
+    authDomain: "academint-2a3f3.firebaseapp.com",
+    projectId: "academint-2a3f3",
+    storageBucket: "academint-2a3f3.firebasestorage.app",
+    messagingSenderId: "878349109026",
+    appId: "1:878349109026:web:f999530f905f8c1ccc877b",
+    measurementId: "G-YW769PREMF"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Redirect if already logged in
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Check if admin
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (adminDoc.exists()) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+  });
+
+  window.handleSignIn = async function() {
+    const email = document.getElementById('signin-email').value.trim();
+    const password = document.getElementById('signin-password').value;
+    const errEl = document.getElementById('signin-error');
+    const successEl = document.getElementById('signin-success');
+    const btn = document.getElementById('signin-btn');
+    const spinner = document.getElementById('signin-spinner');
+    const label = document.getElementById('signin-label');
+
+    errEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (!email || !password) {
+      errEl.textContent = 'Please enter your email and password.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    label.textContent = 'Signing in…';
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const adminDoc = await getDoc(doc(db, 'admins', cred.user.uid));
+      successEl.textContent = 'Signed in! Redirecting…';
+      successEl.style.display = 'block';
+      setTimeout(() => {
+        window.location.href = adminDoc.exists() ? 'admin.html' : 'dashboard.html';
+      }, 800);
+    } catch (err) {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      label.textContent = 'Sign In';
+      const msgs = {
+        'auth/invalid-credential': 'Incorrect email or password.',
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/too-many-requests': 'Too many attempts. Please try again later.',
+        'auth/invalid-email': 'Please enter a valid email address.'
+      };
+      errEl.textContent = msgs[err.code] || 'Sign in failed. Please try again.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  window.handleReset = async function() {
+    const email = document.getElementById('reset-email').value.trim();
+    const errEl = document.getElementById('reset-error');
+    const successEl = document.getElementById('reset-success');
+    const btn = document.getElementById('reset-btn');
+    const spinner = document.getElementById('reset-spinner');
+    const label = document.getElementById('reset-label');
+
+    errEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (!email) {
+      errEl.textContent = 'Please enter your email address.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    label.textContent = 'Sending…';
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      successEl.textContent = 'Reset link sent! Check your inbox (and spam folder).';
+      successEl.style.display = 'block';
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      label.textContent = 'Send Reset Link';
+    } catch (err) {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      label.textContent = 'Send Reset Link';
+      errEl.textContent = err.code === 'auth/user-not-found'
+        ? 'No account found with this email.'
+        : 'Failed to send reset link. Please try again.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  // Enter key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const active = document.querySelector('.tab-panel.active').id;
+      if (active === 'tab-signin') handleSignIn();
+      else if (active === 'tab-reset') handleReset();
+    }
+  });
+</script>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.login-tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'signin' && i === 0) || (tab === 'reset' && i === 1));
+  });
+  document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('tab-reset').classList.toggle('active', tab === 'reset');
+}
+
+// Hamburger
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+const menuClose = document.getElementById('menuClose');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+menuClose.addEventListener('click', () => {
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+});
+</script>
+
+</body>
+</html>
